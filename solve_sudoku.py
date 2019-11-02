@@ -1,6 +1,9 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
+import pprint
+
+
 table_text = '''
 610 900 073
 200 400 000
@@ -35,7 +38,6 @@ class GameTable(object):
         '''
         GameTable:
         '''
-        import pprint
         pprint.pprint(self.table)
 
     def wpisz(self, i, j):
