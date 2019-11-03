@@ -25,6 +25,26 @@ table_text = '''
 table_text = ''.join(table_text.strip().split())
 table_text = map(int, table_text)
 
+class FileSaver(object):
+    def __init__(self):
+        '''
+        FileSaver:
+        '''
+        self.out_counter = 0
+
+    def execute_save(self, out_txt):
+        '''
+        FileSaver:
+        '''
+        file_name = 'g%d' % self.out_counter
+        fd = open(file_name, 'wb')
+        fd.write(out_txt)
+        fd.close()
+        print 'Saved to file: %s' % file_name
+        self.out_counter += 1
+
+file_saver = FileSaver()
+
 class GameField(object):
     def set_current(self, one_current):
         '''
@@ -107,12 +127,17 @@ class GameTable(object):
         '''
         GameTable:
         '''
+        main_ls = []
         for row_nr in range(self.size):
-            out_line = []
+            line_ls = []
             for col_nr in range(self.size):
                 one_elem = self.table[row_nr * self.size + col_nr].get_text()
-                out_line.append(one_elem)
-            print ' '.join(out_line)
+                line_ls.append(one_elem)
+            one_line = ' '.join(line_ls)
+            main_ls.append(one_line)
+            main_ls.append('\n')
+        out_txt = ''.join(main_ls)
+        file_saver.execute_save(out_txt)
 
     def wpisz(self, i, j):
         '''
