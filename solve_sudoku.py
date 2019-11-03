@@ -2,8 +2,11 @@
 # -*- coding: UTF-8 -*-
 
 import pprint
+import time
 
-verbose = 1
+verbose = 0
+verb_summary = 0
+verb_timed = 1
 
 
 table_text = '''
@@ -90,15 +93,15 @@ class GameTable(object):
         '''
         GameTable:
         '''
+        self.last_msg = time.time()
         self.size = 9
+        self.siz_e = self.size - 1
         self.table = []
         for i in range(self.size):
             offset = self.size * i
-            line_ls = []
             for j in range(self.size):
                 new_elem = GameField(table_text[offset + j])
-                line_ls.append(new_elem)
-            self.table.append(line_ls)
+                self.table.append(new_elem)
 
     def display_table(self):
         '''
@@ -107,29 +110,38 @@ class GameTable(object):
         for row_nr in range(self.size):
             out_line = []
             for col_nr in range(self.size):
-                one_elem = self.table[row_nr][col_nr].get_text()
+                one_elem = self.table[row_nr * self.size + col_nr].get_text()
                 out_line.append(one_elem)
-            #print ' '.join(out_line)
+            print ' '.join(out_line)
 
     def wpisz(self, i, j):
         '''
         GameTable:
         '''
-        if verbose:
-            tmp_format = 'i, j'; print('\x1b[42mEval\x1b[0m: %s %s' % (tmp_format, eval(tmp_format)))
-        game_field = self.table[i][j]
+        show_on_time = 0
+        if verb_timed:
+            time_now = time.time()
+            if time_now - self.last_msg >= 1.0:
+                show_on_time = 1
+                self.last_msg = time_now
+        if verb_summary or show_on_time:
+            k = []
+            for index in range(i * self.size + j):
+                k.append(self.table[index].get_possib()[0])
+            tmp_format = 'i, j, k'; print('\x1b[42mEval\x1b[0m: %s %s' % (tmp_format, eval(tmp_format)))
+        game_field = self.table[i * self.size + j]
         mozliwosci = game_field.get_possib()
         if len(mozliwosci) > 1:
             for row_nr in range(self.size):
                 if row_nr != i:
                     if verbose:
                         print 'Removing from row = %d' % row_nr
-                    game_field.remove_from_list(self.table[row_nr][j])
+                    game_field.remove_from_list(self.table[row_nr * self.size + j])
             for col_nr in range(self.size):
                 if col_nr != j:
                     if verbose:
                         print 'Removing from col = %d' % col_nr
-                    game_field.remove_from_list(self.table[i][col_nr])
+                    game_field.remove_from_list(self.table[i * self.size + col_nr])
             row_offset = (i // 3) * 3
             col_offset = (j // 3) * 3
             for row_nr in range(row_offset, row_offset + 3):
@@ -137,19 +149,19 @@ class GameTable(object):
                     if row_nr != i and col_nr != j:
                         if verbose:
                             print 'Removing from row = %d col = %d' % (row_nr, col_nr)
-                        game_field.remove_from_list(self.table[row_nr][col_nr])
+                        game_field.remove_from_list(self.table[row_nr * self.size + col_nr])
             mozliwosci = game_field.get_possib()
         if verbose:
             tmp_format = 'mozliwosci'; print('\x1b[41mEval\x1b[0m: %s %s' % (tmp_format, eval(tmp_format)))
         for one_possib in mozliwosci:
-            self.table[i][j].set_current(one_possib)
-            if j < self.size - 1:
+            self.table[i * self.size + j].set_current(one_possib)
+            if j < self.siz_e:
                 self.wpisz(i, j + 1)
-            elif i < self.size - 1:
+            elif i < self.siz_e:
                 self.wpisz(i + 1, 0)
             else:
                 self.display_table()
-            game_field.set_current(None)
+        game_field.set_current(None)
 
 game_table = GameTable()
 game_table.wpisz(0, 0)
