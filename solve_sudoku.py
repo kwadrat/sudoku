@@ -70,8 +70,6 @@ class GameField(object):
             out_ls = [one_fixed]
             if verbose:
                 tmp_format = 'one_fixed'; print('Eval: %s %s' % (tmp_format, eval(tmp_format)))
-        if verbose:
-            tmp_format = 'out_ls'; print('Eval: %s %s' % (tmp_format, eval(tmp_format)))
         return out_ls
 
     def remove_from_list(self, one_field):
@@ -141,6 +139,8 @@ class GameTable(object):
                             print 'Removing from row = %d col = %d' % (row_nr, col_nr)
                         game_field.remove_from_list(self.table[row_nr][col_nr])
             mozliwosci = game_field.get_possib()
+        if verbose:
+            tmp_format = 'mozliwosci'; print('\x1b[41mEval\x1b[0m: %s %s' % (tmp_format, eval(tmp_format)))
         for one_possib in mozliwosci:
             self.table[i][j].set_current(one_possib)
             if j < self.size - 1:
