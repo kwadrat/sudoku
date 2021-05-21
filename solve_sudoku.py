@@ -1,8 +1,8 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
-import pprint
 import time
+import sys
 
 import input_data
 
@@ -10,6 +10,7 @@ verbose = 0
 verb_summary = 0
 verb_timed = 1
 
+three_or_more = sys.version >= '3'
 
 if 0:
     ##############################################################################
@@ -32,7 +33,8 @@ else:
     table_text = input_data.table_text
     ##############################################################################
 table_text = ''.join(table_text.strip().split())
-table_text = map(int, table_text)
+table_text = list(map(int, table_text))
+
 
 class FileSaver(object):
     def __init__(self):
@@ -49,10 +51,12 @@ class FileSaver(object):
         fd = open(file_name, 'wb')
         fd.write(out_txt)
         fd.close()
-        print 'Saved to file: %s' % file_name
+        print('Saved to file: %s' % file_name)
         self.out_counter += 1
 
+
 file_saver = FileSaver()
+
 
 class GameField(object):
     def set_current(self, one_current):
@@ -96,12 +100,14 @@ class GameField(object):
         one_fixed = self.get_fixed()
         if one_fixed is None:
             if verbose:
-                tmp_format = 'self.int_possib, self.disabled_ls'; print('Eval: %s %s' % (tmp_format, eval(tmp_format)))
+                tmp_format = 'self.int_possib, self.disabled_ls'
+                print('Eval: %s %s' % (tmp_format, eval(tmp_format)))
             out_ls = list(set(self.int_possib) - set(self.disabled_ls))
         else:
             out_ls = [one_fixed]
             if verbose:
-                tmp_format = 'one_fixed'; print('Eval: %s %s' % (tmp_format, eval(tmp_format)))
+                tmp_format = 'one_fixed'
+                print('Eval: %s %s' % (tmp_format, eval(tmp_format)))
         return out_ls
 
     def remove_from_list(self, one_field):
@@ -146,6 +152,8 @@ class GameTable(object):
             main_ls.append(one_line)
             main_ls.append('\n')
         out_txt = ''.join(main_ls)
+        if three_or_more:
+            out_txt = out_txt.encode('utf-8')
         file_saver.execute_save(out_txt)
 
     def wpisz(self, i, j):
@@ -162,19 +170,20 @@ class GameTable(object):
             k = []
             for index in range(i * self.size + j):
                 k.append(self.table[index].get_possib()[0])
-            tmp_format = 'i, j, k'; print('\x1b[42mEval\x1b[0m: %s %s' % (tmp_format, eval(tmp_format)))
+            tmp_format = 'i, j, k'
+            print('\x1b[42mEval\x1b[0m: %s %s' % (tmp_format, eval(tmp_format)))
         game_field = self.table[i * self.size + j]
         mozliwosci = game_field.get_possib()
         if len(mozliwosci) > 1:
             for row_nr in range(self.size):
                 if row_nr != i:
                     if verbose:
-                        print 'Removing from row = %d' % row_nr
+                        print('Removing from row = %d' % row_nr)
                     game_field.remove_from_list(self.table[row_nr * self.size + j])
             for col_nr in range(self.size):
                 if col_nr != j:
                     if verbose:
-                        print 'Removing from col = %d' % col_nr
+                        print('Removing from col = %d' % col_nr)
                     game_field.remove_from_list(self.table[i * self.size + col_nr])
             row_offset = (i // 3) * 3
             col_offset = (j // 3) * 3
@@ -182,11 +191,12 @@ class GameTable(object):
                 for col_nr in range(col_offset, col_offset + 3):
                     if row_nr != i and col_nr != j:
                         if verbose:
-                            print 'Removing from row = %d col = %d' % (row_nr, col_nr)
+                            print('Removing from row = %d col = %d' % (row_nr, col_nr))
                         game_field.remove_from_list(self.table[row_nr * self.size + col_nr])
             mozliwosci = game_field.get_possib()
         if verbose:
-            tmp_format = 'mozliwosci'; print('\x1b[41mEval\x1b[0m: %s %s' % (tmp_format, eval(tmp_format)))
+            tmp_format = 'mozliwosci'
+            print('\x1b[41mEval\x1b[0m: %s %s' % (tmp_format, eval(tmp_format)))
         for one_possib in mozliwosci:
             self.table[i * self.size + j].set_current(one_possib)
             if j < self.siz_e:
@@ -196,6 +206,7 @@ class GameTable(object):
             else:
                 self.display_table()
         game_field.set_current(None)
+
 
 game_table = GameTable()
 game_table.wpisz(0, 0)
